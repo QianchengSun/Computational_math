@@ -326,3 +326,4 @@ print(Hpoly_1)
 Hpoly_2 = Hpoly_3
 print(Hpoly_2)
 # %%
+# Question 3
