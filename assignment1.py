@@ -230,6 +230,8 @@ def GaussHermite(mu, sigma2, N):
 
     integral(e^(-x^2) f(x) dx) from (-inf, inf) 
 
+    The reference algorithm is in : "Basic of Numerical Analysis" Page 215 
+
     Input variables :
 
     mu : the mean or expectation of the distribution
