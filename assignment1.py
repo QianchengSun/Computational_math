@@ -237,6 +237,12 @@ def GaussHermite(mu, sigma2, N):
     sigma2 : sigma2 us tge variance of the distribution, sigma is the standard deviation of the distribution
 
     N : number of nodes
+
+    Output variables:
+
+    X : the root of the Hpoly 
+
+    w : the weight for solving linear system 
     
     """
     # Set up the initial value for Hpoly_1
