@@ -218,112 +218,137 @@ x_4 , i_4 = Jacobi(Input_matrix_A= A,
 
 
 # %% 2. Use the Gauss-Hermite quadrature formular to approximate E[f(x)]  where  X ~ N(mu, sigma^2)
-
+"""
+The Algorithm design for calculating the weight has some questions, the sum(w) should be equal to 1
+"""
 # define the Gauss-Hermite function
 def GaussHermite(mu, sigma2, N):
     """
     Function description :
 
-    This is the function to use Gauss-Hermite method to  
+    In numerical analysis, Gauss-Hermite quadrature is a form of Gaussian quadrature for approximating the value of integrals of the following kind:
 
+    integral(e^(-x^2) f(x) dx) from (-inf, inf) 
 
     Input variables :
 
-    mu : Random Variables
+    mu : the mean or expectation of the distribution
 
-    sigma2 :
+    sigma2 : sigma2 us tge variance of the distribution, sigma is the standard deviation of the distribution
 
     N : number of nodes
     
     """
-    Hpoly_1 = np.array([0, 0 ,1/ np.pi ** 0.25]).reshape(3)
-    print(Hpoly_1)
-    Hpoly_2 = np.array([np.sqrt(2)/np.pi ** 0.25 , 0, 0]).reshape(3) # define the Hpoly as a 
-    print(Hpoly_2)
+    # Set up the initial value for Hpoly_1
+    Hpoly_1 = np.array([1/ np.pi ** 0.25])
+    # Set up the initial value for Hpoly_2
+    Hpoly_2 = np.array([np.sqrt(2)/np.pi ** 0.25 , 0]) 
+    # Create a list to collect all the Hpoly_1 result
+    Hpoly_1_list = []
+    # Create a list to collect all the Hpoly_3 result
     Hpoly_3_list = []
-    for i in range(1, (N - 1)):
-        a = np.sqrt(2 / (i + 1)) * Hpoly_2  # a will be a 1x3 vector
-        b = np.sqrt(i / (i + 1)) * Hpoly_1  # b will be 
-        Hpoly_3 = a - b
+
+    for i in range(1, (N)):
+        a = np.sqrt(2 / (i + 1)) * Hpoly_2  
+        b = np.sqrt(i / (i + 1)) * Hpoly_1  
+        """
+        When do the calculation in GaussHermite, the shape of Hpoly_3 will increasing,
+
+        Therefore, the method in here is generate a array which is 1 x N (1 rows, N column) that can dynamically change
+
+        In order to make the Gauss Hermite run properly
+
+        Then the work flow in here will be :
+
+        1. Generate the empty array with Nan value, then force the Hpoly value fit into this empty array.
+
+        2. Do the calculation and renew  the value by each iteration
+        
+        """
+        Hpoly_1_list.append(Hpoly_1)
+        # Here the Hpoly_mid_a represent for the mid product for calculate the Hpoly_3
+        # "a" is set up at the beginning of the for loop
+        """
+        Here the idea for implement is :
+
+        Since the shape of the Hpoly_a will change each iteration,
+
+        At first iteration, the shape of "a" will be (1x3)
+
+        At second iteration, the shape of "a" will be (1x4), .......
+
+        Therefore, in each iteration use i+2 to reshape the the size in order to fit for the iteration result
+        """
+        Hpoly_mid_a = np.zeros(shape = (i + 2 , 1))
+        Hpoly_mid_a[0:i+1] = a.reshape(i+1, 1)
+        Hpoly_mid_a[i+1] = 0
+        """
+        Here the idea for implement is :
+
+        Since the shape of the Hpoly_a will change each iteration,
+
+        At first iteration, the shape of "b" will be (1x3)
+
+        At second iteration, the shape of "b" will be (1x4), .......
+
+        Therefore, in each iteration use i+2 to reshape the the size in order to fit for the iteration result
+        """
+        Hpoly_mid_b = np.zeros(shape = (i + 2 , 1))
+        Hpoly_mid_b[0] = 0
+        Hpoly_mid_b[1] = 0
+        Hpoly_mid_b[2:i+2] = b.reshape(i, 1)
+        # obtain the new Hpoly_3 and do the iterate calculation
+        Hpoly_3 = Hpoly_mid_a  - Hpoly_mid_b
         Hpoly_3_list.append(Hpoly_3)
         Hpoly_1 = Hpoly_2
         Hpoly_2 = Hpoly_3
-
-
-
-
-    x_1 = np.roots(Hpoly_3)
+    # calculate the root value of Hpoly_3
+    x_1 = np.roots(Hpoly_3.reshape(N+1))
     w_1 = np.zeros(shape = (N,1))
     w_1_list = []
+    # Create a for loop to calculate weight
     for i in range(1, N):
-        w_1[i] = 1/(N)/ np.polyval(Hpoly_1, x_1[i]) ** 2
+        """
+        Python start the calculation with 0, 
+
+        Therefore, here should use i -1 to represent for the calculation which start from 0
+        
+        Also, use np.polyval() function to evaluate the polynomial at specific values
+
+        Reference website:
+
+        https://numpy.org/doc/stable/reference/generated/numpy.polyval.html
+
+        """
+        w_1[i-1] = 1/(N+1)/ (np.polyval(Hpoly_1_list[i-1], x_1[i-1])) ** 2
         w_1_list.append(w_1)
-    [x, index] = np.array(np.sort(x_1 * np.sqrt(2 * sigma2) + mu))
-    w = np.array(w_1[index]/np.sqrt(np.pi))
+    # use np.sort() function to sort the value from small to big
+    x = np.sort(np.array(x_1 * np.sqrt(2 * sigma2) + mu))
+    # print result with description
+    print("The X values are :", x)
+    # calculate the weight
+    w = np.array(np.divide(w_1,np.sqrt(np.pi)))
+    # print result with description
+    print("The weights are :", w)
 
     return x, w
 
+#  GaussHermite test fpr (10,20,5)
+x , w = GaussHermite(mu = 10,
+                    sigma2 = 20,
+                    N = 5)
+
+# %% Use GaussHermite function to calculate E[sin(x)e^x]
+N = np.array([5])
+
+for i in range(1, len(N)):
+    x, w = GaussHermite(mu=5,
+                        sigma2= 10,
+                        N = 5)
+    function_result = np.sin(x) * np.exp(x)
+    approxvalue = np.matmul(w.reshape(1,N[0]), function_result.reshape(N[0],1)) # 1x5 5x1
+    print(approxvalue)
 
 
 
 # %%
-x , w = GaussHermite(10,20,5)
-
-
-# %%
-N = 5
-Hpoly_1 = np.array([1/ np.pi ** 0.25])
-print(Hpoly_1)
-Hpoly_2 = np.array([np.sqrt(2)/np.pi ** 0.25 , 0]) # define the Hpoly as a 
-print(Hpoly_2)
-
-Hpoly_3_list = []
-Hpoly_1_list = []
-Hpoly_2_list = []
-for i in range(1, (N)):
-    a = np.sqrt(2 / (i + 1)) * Hpoly_2  # a will be a 1x3 vector
-    b = np.sqrt(i / (i + 1)) * Hpoly_1  # b will be 
-    Hpoly_3 = a - b
-    Hpoly_3_list.append(Hpoly_3)
-    Hpoly_1 = Hpoly_2
-    Hpoly_1_list.append(Hpoly_1)
-    Hpoly_2 = Hpoly_3
-    Hpoly_2_list.append(Hpoly_2)
-
-
-
-print(Hpoly_3_list)
-#%%
-sigma2 = 20
-mu = 10
-w_1 = np.zeros(shape = (N,1))
-w_1_list = []
-for i in range(1, N):
-    x_1 = np.roots(Hpoly_3_list[i - 1])
-
-    c = np.array(1/(N)/ np.polyval(Hpoly_1, x_1) ** 2)
-    print(c)
-    w_1 = c[0]
-    w_1_list.append(w_1)
-#%%
-[x, index] = np.array(np.sort(x_1 * np.sqrt(2 * sigma2) + mu))
-w = np.array(w_1/np.sqrt(np.pi))
-
-
-# %%
-Hpoly_1 = np.array([1/ np.pi ** 0.25])
-print(Hpoly_1)
-Hpoly_2 = np.array([np.sqrt(2)/np.pi ** 0.25 , 0]) # define the Hpoly as a 
-print(Hpoly_2)
-#%%
-a = np.sqrt(2 / (i + 1)) * Hpoly_2  # a will be a 1x3 vector
-b = np.sqrt(i / (i + 1)) * Hpoly_1  # b will be 
-Hpoly_3 = a - b
-print(Hpoly_3)
-#%%
-Hpoly_1 = Hpoly_2
-print(Hpoly_1)
-Hpoly_2 = Hpoly_3
-print(Hpoly_2)
-# %%
-# Question 3
