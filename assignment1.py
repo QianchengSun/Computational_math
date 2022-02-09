@@ -347,8 +347,8 @@ for i in range(1, len(N)):
                         N = 5)
     function_result = np.sin(x) * np.exp(x)
     approxvalue = np.matmul(w.reshape(1,N[0]), function_result.reshape(N[0],1)) # 1x5 5x1
-    print(approxvalue)
 
 
-
+approximate_value = np.matmul(w.reshape(1,N[0]), function_result.reshape(N[0],1))
+print("The approximate value is :", approximate_value)
 # %%
