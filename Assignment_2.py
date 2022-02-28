@@ -78,7 +78,7 @@ def monte_carlo(miu, sigma2, n):
     """
     Note: here should generate N x 1 shape numpy array
     """
-    x_i = np.sqrt(sigma2) * np.random.rand(n, 1) + miu
+    x_i = np.sqrt(sigma2) * np.random.randn(n, 1) + miu # N ~ (0,1)
     # define the f(x)
     f_x = np.sin(x_i) * np.exp(x_i)
     # use monte-carlo simulation to estimate
@@ -89,12 +89,12 @@ def monte_carlo(miu, sigma2, n):
     sample_variance = sum((f_x - sample_mean) ** 2) / n
     # calculate the confidence interval at 0.95
     left_confidence_interval, right_confidence_interval = confidence_interval(x= f_x, confidence= 0.95)
-
-    print("sample mean is :", sample_mean)
-    print("sample variance is :", sample_variance)
-    print("confidence interval at 0.95 is :", (left_confidence_interval, right_confidence_interval))
+    print("the number of sample path is:", n)
+    print("sample mean is:", sample_mean)
+    print("sample variance is:", sample_variance)
+    print("confidence interval at 0.95 is:", (left_confidence_interval, right_confidence_interval))
     return sample_mean, sample_variance, left_confidence_interval, right_confidence_interval
 #%%
-mean, variance, left_confidence_interval, right_confidence_interval = monte_carlo(miu = 5, sigma2 = 1, n = 1000)
+mean, variance, left_confidence_interval, right_confidence_interval = monte_carlo(miu = 5, sigma2 = 1, n = 500000)
 
 # %%
