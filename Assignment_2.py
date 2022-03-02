@@ -4,6 +4,8 @@
 #%% import packages
 import numpy as np
 from scipy.stats import t
+from scipy.stats import norm
+import matplotlib as plt
 #%%
 # Monte-Carlo Simulation
 def confidence_interval(x, confidence):
@@ -41,7 +43,7 @@ def confidence_interval(x, confidence):
     dof = len(x) - 1
     confidence = confidence
     # calculate the t value 
-    t_crit = np.abs(t.ppf((1 - confidence) /2, dof))
+    t_crit = np.abs(t.ppf((1 - confidence) /2, dof)) # ppf calculates the inverse cumulative distribution function.
     # confidence interval
     # left 
     left_confidence_interval = m - std * t_crit / np.sqrt(len(x))
@@ -86,7 +88,7 @@ def monte_carlo(miu, sigma2, n):
     # calculate the variance
     # reference website
     # https://www.calculatorsoup.com/calculators/statistics/variance-calculator.php
-    sample_variance = sum((f_x - sample_mean) ** 2) / n
+    sample_variance = sum((f_x - sample_mean) ** 2) / (n - 1)
     # calculate the confidence interval at 0.95
     left_confidence_interval, right_confidence_interval = confidence_interval(x= f_x, confidence= 0.95)
     print("the number of sample path is:", n)
@@ -97,4 +99,100 @@ def monte_carlo(miu, sigma2, n):
 #%%
 mean, variance, left_confidence_interval, right_confidence_interval = monte_carlo(miu = 5, sigma2 = 1, n = 500000)
 
+# %%
+# Black Scholes formula
+# define the black scholes call function
+def bs_call(S, K, T, r, sigma):
+    """
+    Here is the function that using the Black Scholes formula to price the European call
+
+    Arguments:
+    Input :
+        S : current asset price 
+        K : strike price of the option
+        r : risk free interest rate 
+        T : time until option expiration
+        sigma : annualized volatility of the asset's return
+
+    Output : 
+        Paying stock
+    """
+
+    # methodology 
+    """
+    Methodology :
+    Call option : 
+        Call = S0 * N(d1) - N(d2) * K * e^ (-rT)
+    
+    Reference website : 
+    https://www.codearmo.com/python-tutorial/options-trading-black-scholes-model
+
+    """
+
+    d1 = (np.log(S / K) + (r + sigma ** 2 / 2) * T) / (sigma * np.sqrt(T))
+
+    d2 = d1 - sigma * np.sqrt(T)
+
+    call_option = S * norm.cdf(d1) - K * np.exp(- r * T) * norm.cdf(d2)
+
+    return call_option
+
+
+
+def bs_put(S, K, T, r, sigma):
+    """
+    Here is the function that using the Black Scholes formula to price the European put
+
+    Arguments:
+    Input :
+        S : current asset price 
+        K : strike price of the option
+        r : risk free interest rate 
+        T : time until option expiration
+        sigma : annualized volatility of the asset's return
+
+    Output : 
+        Paying stock
+    """
+
+    # methodology 
+    """
+    Methodology :
+    Put option : 
+        Put = N(-d2) * K * exp(-r * T) - N(-d1) * S0
+    
+    Reference website : 
+    https://www.codearmo.com/python-tutorial/options-trading-black-scholes-model
+
+    """
+
+    d1 = (np.log(S / K) + (r + sigma ** 2 / 2) * T) / (sigma * np.sqrt(T))
+
+    d2 = d1 - sigma * np.sqrt(T)
+
+    put_option = norm.cdf(-d2) * K * np.exp(-r * T) - norm.cdf(-d1) * S
+
+    return put_option
+# %% Question 2
+# Use the Black-Scholes formula to price European all and put options
+maturity = 1 # T
+interest_rate = 0.07 # r
+volatility = 0.35 # sigma
+strike_price = 100 # K
+stock_price = np.array([80,85,90,95,98,100,102,105,110,115,120])  # S 
+
+
+
+
+
+call_price = bs_call(S= 80,
+                    K= 100,
+                    T= 1,
+                    r= 0.07,
+                    sigma= 0.35)
+put_price = bs_put(S= 80,
+                    K= 100,
+                    T= 1,
+                    r= 0.07,
+                    sigma= 0.35)                    
 # %%
