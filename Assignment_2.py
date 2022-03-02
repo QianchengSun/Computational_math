@@ -210,7 +210,7 @@ plt.title("Call Price")
 plt.xlabel("stock price")
 plt.ylabel("call price")
 plt.show()
-plt.savefig(r"/Users/qianchengsun/Desktop/Computational_Finance/Assignments/call_price.png")
+# plt.savefig(r"/Users/qianchengsun/Desktop/Computational_Finance/Assignments/call_price.jpg")
 # plot the call price
 x = stock_price
 y = put_price_list
@@ -222,14 +222,21 @@ plt.title("Put Price")
 plt.xlabel("stock price")
 plt.ylabel("Put price")
 plt.show()
-plt.savefig(r"/Users/qianchengsun/Desktop/Computational_Finance/Assignments/put_price.png")
-# %%
+# plt.savefig(r"/Users/qianchengsun/Desktop/Computational_Finance/Assignments/put_price.jpg")
 # Part B
-
+# See solution in Matlab version
 #%%
 # Question 3 slove heat equation by explicit finite difference method
 # define heat explicit function
 def heat_explicit(delta_x, delta_t, t_max):
+    """
+    function to solve heat equation by explicit finite difference method
+    
+    Reference :
+
+    Example 5.3 on Page 305, Figure 5.14 on Page 306
+    
+    """
     N = np.round(1 / delta_x)
     N = int(N)
     M = np.round(t_max / delta_t)
@@ -241,40 +248,50 @@ def heat_explicit(delta_x, delta_t, t_max):
     vetx = np.linspace(0,1, int(1/delta_x) + 1)
 
     for i in range(1, int(np.ceil((N + 1) / 2))): # from 2 to 6
-        sol[i,0] = 2 * vetx[i - 1]
-        sol[N + 1 - i, 0] = sol[i,0]
-
-    for j in range(0, M - 1):
-        for k in range(1, N - 1):
-            sol[k, j + 1 ] = rho * sol[k - 1, j] + rho2 * sol[k,j] + rho * sol[k + 1, j]
+        """
+        Part A
+        """
+        # sol[i,0] = 2 * vetx[i]
+        """
+        Part B
+        """
+        sol[i,0] = np.sin(np.pi * vetx[i])
+        sol[N - i, 0] = sol[i,0]
+    
+    for j in range(0, M):
+        for k in range(1, N):
+            sol[k, j + 1] = rho * sol[k - 1, j] + rho2 * sol[k,j] + rho * sol[k + 1, j]
 
     return sol
-#%%
+
 # define variables
 delta_x = 0.1
 delta_t = 0.001
 t_max = delta_t * 100
 sol = heat_explicit(delta_x = delta_x,delta_t = delta_t,t_max = t_max)
 # plot the result
+# t = 0
 x = np.linspace(0,1, int(1/delta_x) + 1)
 y = sol[:,0]
 figure = plt.figure()
 ax = plt.axes()
 ax.plot(x,y)
 plt.show()
-#%%
+# t = 0.01
 x = np.linspace(0,1, int(1/delta_x) + 1)
 y = sol[:,10]
 figure = plt.figure()
 ax = plt.axes()
 ax.plot(x,y)
 plt.show()
+# t = 0.05
 x = np.linspace(0,1, int(1/delta_x) + 1)
 y = sol[:,50]
 figure = plt.figure()
 ax = plt.axes()
 ax.plot(x,y)
 plt.show()
+# t = 0.1
 x = np.linspace(0,1, int(1/delta_x) + 1)
 y = sol[:,100]
 figure = plt.figure()
