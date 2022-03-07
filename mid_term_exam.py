@@ -149,9 +149,9 @@ def bs_put(S, K, T, r, sigma):
 #%% 
 # Part A
 # question part a 1)
-# S = np.array([40,45,48,50,52,55,60])
+S = np.array([40,45,48,50,52,55,60])
 # question part a 2)
-S = np.linspace(30,70, 70-30+1)
+# S = np.linspace(30,70, 70-30+1)
 T = 0.5
 r = 0.05
 sigma = 0.4
@@ -193,9 +193,9 @@ plt.show()
 # Part B
 S = 49
 # Question 1)
-# T = np.linspace(0.3, 0.8, 6)
+T = np.linspace(0.3, 0.8, 6)
 # Question 2) 
-T = np.linspace(0.1, 1, 21)
+# T = np.linspace(0.1, 1, 21)
 r = 0.05
 sigma = 0.4
 K = 50 
@@ -237,9 +237,9 @@ S = 50
 T = 1
 r = 0.05
 # question 1)
-# sigma = np.linspace(0.2,0.5, 7)
+sigma = np.linspace(0.2,0.5, 7)
 # question 2)
-sigma = np.linspace(0.1,0.8, int((0.8 - 0.1)/ 0.02 + 1))
+# sigma = np.linspace(0.1,0.8, int((0.8 - 0.1)/ 0.02 + 1))
 K = 50 
 call_price_list = []
 put_price_list = []
@@ -279,9 +279,9 @@ plt.show()
 S = 52
 T = 1
 # question 1)
-# r = np.linspace(0.02, 0.07, int((0.07 - 0.02)/ 0.01 + 1))
+r = np.linspace(0.02, 0.07, int((0.07 - 0.02)/ 0.01 + 1))
 # question 2)
-r = np.linspace(0.01, 0.08, int((0.08 - 0.01)/ 0.005 + 1))
+# r = np.linspace(0.01, 0.08, int((0.08 - 0.01)/ 0.005 + 1))
 sigma = 0.35
 K = 50 
 call_price_list = []
@@ -333,7 +333,7 @@ def heat_explicit(delta_x, delta_t, t_max, K):
     """
     N = np.round(2 / delta_x)
     N = int(N)
-    M = np.round(t_max / delta_t)
+    M = np.round(t_max/ delta_t)
     M = int(M)
     sol = np.zeros(shape = (N + 1, M + 1))
     rho = delta_t / (delta_x ** 2) * K
@@ -352,11 +352,11 @@ def heat_explicit(delta_x, delta_t, t_max, K):
     return sol
 
 # define variables
-delta_x = 0.2
-delta_t = 0.002
-t_max = delta_t * 1000
+delta_x = 0.1
+delta_t = 0.001
+T = 2
 
-sol = heat_explicit(delta_x = delta_x,delta_t = delta_t,t_max = t_max, K = 3/2)
+sol = heat_explicit(delta_x = delta_x,delta_t = delta_t,t_max = T, K = 3/2)
 # plot the result
 # t = 0
 x = np.linspace(1,3, int(2/delta_x) + 1)
@@ -402,4 +402,12 @@ ax = plt.axes()
 ax.plot(x,y)
 plt.show()
 
+# %%
+# t = 2
+x = np.linspace(1,3, int(2/delta_x) + 1)
+y = sol[:,2000]
+figure = plt.figure()
+ax = plt.axes()
+ax.plot(x,y)
+plt.show()
 # %%
